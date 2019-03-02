@@ -14,7 +14,8 @@
         app:actualImageScaleType="fitCenter"
         app:placeholderImage="@mipmap/ic_launcher"
         app:placeholderImageScaleType="fitCenter"
-        app:viewAspectRatio="1" />
+        app:viewAspectRatio="1"
+        tools:placeholderImage="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/labelTextView"
@@ -27,6 +28,6 @@
         android:paddingEnd="8dp"
         android:textColor="@android:color/white"
         android:textStyle="bold"
-        tools:text="Chrome" />
+        tools:text="@tools:sample/cities" />
 
 </LinearLayout>
