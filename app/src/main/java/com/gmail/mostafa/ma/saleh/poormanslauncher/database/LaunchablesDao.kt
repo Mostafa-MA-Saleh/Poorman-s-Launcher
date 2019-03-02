@@ -18,6 +18,9 @@ interface LaunchablesDao {
     @Query("SELECT * FROM Launchables")
     fun getAll(): LiveData<List<Launchable>>
 
+    @Query("SELECT * FROM Launchables WHERE packageName = :packageName")
+    fun getByPackageName(packageName: String): Launchable?
+
     @Query("DELETE FROM Launchables")
     fun deleteAll()
 }

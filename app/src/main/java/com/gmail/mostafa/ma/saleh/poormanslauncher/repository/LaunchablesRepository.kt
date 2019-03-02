@@ -10,4 +10,7 @@ class LaunchablesRepository(private val launchablesDao: LaunchablesDao) {
 
     @WorkerThread
     suspend fun insert(launchable: Launchable) = launchablesDao.insert(launchable)
+
+    @WorkerThread
+    suspend fun getByPackageName(packageName: String) = launchablesDao.getByPackageName(packageName)
 }

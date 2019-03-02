@@ -12,6 +12,9 @@ data class Launchable(
     @ColumnInfo var label: String
 ) : Comparable<Launchable> {
 
+    @ColumnInfo(name = "icon_cached")
+    var isIconCached: Boolean = false
+
     @get:Ignore
     val icon: String
         get() = "$packageName.png"
@@ -20,8 +23,8 @@ data class Launchable(
         context.startActivity(this)
     } ?: Unit
 
-    infix fun hasSameContentAs(launchable: Launchable) =
-        label == launchable.label && packageName == launchable.packageName
+    infix fun hasSameContentAs(launchable: Launchable?) =
+        launchable != null && label == launchable.label && packageName == launchable.packageName && isIconCached == launchable.isIconCached
 
     override fun equals(other: Any?) = (other as? Launchable)?.packageName == packageName
 

@@ -12,10 +12,7 @@ import com.gmail.mostafa.ma.saleh.poormanslauncher.database.DB
 import com.gmail.mostafa.ma.saleh.poormanslauncher.extensions.toBitmap
 import com.gmail.mostafa.ma.saleh.poormanslauncher.models.Launchable
 import com.gmail.mostafa.ma.saleh.poormanslauncher.repository.LaunchablesRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
@@ -41,21 +38,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 addCategory(Intent.CATEGORY_LAUNCHER)
             }
             pm.queryIntentActivities(acceptableIntent, 0)?.forEach { app ->
-                val launchable = Launchable(
-                    packageName = app.activityInfo.packageName,
-                    label = app.loadLabel(pm).toString()
-                )
-                app.cacheIcon(pm)
-                insert(launchable)
+                launch(Dispatchers.IO) {
+                    val launchable = Launchable(
+                        packageName = app.activityInfo.packageName,
+                        label = app.loadLabel(pm).toString()
+                    )
+                    val existingLaunchable = getByPackaeName(launchable.packageName)
+                    launchable.isIconCached = existingLaunchable?.isIconCached == true || app.cacheIcon(pm)
+                    launchable.takeUnless { it hasSameContentAs existingLaunchable }?.let(::insert)
+                }
             }
         }
     }
 
-    private fun ResolveInfo.cacheIcon(pm: PackageManager) = scope.launch(Dispatchers.IO) {
+    private fun ResolveInfo.cacheIcon(pm: PackageManager) =
         File(context.cacheDir, "${activityInfo.packageName}.png").takeUnless { it.exists() }?.run {
             loadIcon(pm).toBitmap()?.compress(Bitmap.CompressFormat.PNG, 100, outputStream())
-        }
-    }
+        } ?: true
 
     override fun onCleared() {
         super.onCleared()
@@ -64,5 +63,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun insert(launchable: Launchable) = scope.launch(Dispatchers.IO) {
         repository.insert(launchable)
+    }
+
+    fun getByPackaeName(packageName: String) = runBlocking {
+        repository.getByPackageName(packageName)
     }
 }
