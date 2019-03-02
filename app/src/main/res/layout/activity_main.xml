@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
+        android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="4"
         tools:listitem="@layout/list_item_launchable" />
